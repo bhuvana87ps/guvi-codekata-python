@@ -1,8 +1,18 @@
 /* -------------------------
-CODE EDITOR
+GLOBAL VARIABLES
 ------------------------- */
 
-let editor = CodeMirror.fromTextArea(
+let pyodide = null;
+let editor = null;
+
+
+/* -------------------------
+INIT CODE EDITOR
+------------------------- */
+
+window.onload = function(){
+
+editor = CodeMirror.fromTextArea(
 document.getElementById("editor"),
 {
 mode: "python",
@@ -11,11 +21,16 @@ lineNumbers: true
 }
 );
 
+loadPython();
+
+loadProblems();
+
+};
+
+
 /* -------------------------
 LOAD PYTHON (PYODIDE)
 ------------------------- */
-
-let pyodide = null;
 
 async function loadPython(){
 
@@ -29,10 +44,9 @@ document.getElementById("output").innerText = "Python Ready";
 
 }
 
-loadPython();
 
 /* -------------------------
-PROBLEM LIST
+PROBLEM DATA
 ------------------------- */
 
 const problems = [
@@ -45,28 +59,34 @@ code:'print("Hello World")'
 },
 
 {
-title: "Square Number",
-desc: "Input a number and print its square",
-code: 'n=int(input())\nprint(n*n)'
+title:"Square Number",
+difficulty:"Easy",
+desc:"Input a number and print its square",
+code:'n=int(input())\nprint(n*n)'
 },
 
 {
-title: "Add Two Numbers",
-desc: "Input two numbers and print their sum",
-code: 'a,b=map(int,input().split())\nprint(a+b)'
+title:"Add Two Numbers",
+difficulty:"Easy",
+desc:"Input two numbers and print their sum",
+code:'a,b=map(int,input().split())\nprint(a+b)'
 },
 
 {
-title: "Reverse String",
-desc: "Input a string and print reverse",
-code: 's=input()\nprint(s[::-1])'
+title:"Reverse String",
+difficulty:"Easy",
+desc:"Input a string and print reverse",
+code:'s=input()\nprint(s[::-1])'
 }
 
 ];
 
+
 /* -------------------------
-SIDEBAR PROBLEMS
+LOAD PROBLEMS SIDEBAR
 ------------------------- */
+
+function loadProblems(){
 
 const list = document.getElementById("problemList");
 
@@ -86,7 +106,6 @@ card.innerHTML = `
 card.onclick = () => {
 
 document.getElementById("problemTitle").innerText = p.title;
-
 document.getElementById("problemDesc").innerText = p.desc;
 
 editor.setValue(p.code);
@@ -97,52 +116,47 @@ list.appendChild(card);
 
 });
 
+}
+
+
 /* -------------------------
 RUN PYTHON CODE
 ------------------------- */
+
 async function runCode(){
 
-const output = document.getElementById("output");
-const inputText = document.getElementById("userInput").value;
-
 if(!pyodide){
-output.innerText="Python loading...";
+document.getElementById("output").innerText="Python still loading...";
 return;
 }
 
-let code = editor.getValue();
+const code = editor.getValue();
+const output = document.getElementById("output");
+
+output.innerText = "Running...";
 
 try{
 
-let wrapped = `
+pyodide.runPython(`
 import sys
 from io import StringIO
+sys.stdout = StringIO()
+`);
 
-input_data = """${inputText}""".split("\\n")
-input_index = 0
+await pyodide.runPythonAsync(code);
 
-def input():
-    global input_index
-    value = input_data[input_index]
-    input_index += 1
-    return value
+let result = pyodide.runPython("sys.stdout.getvalue()");
 
-buffer = StringIO()
-sys.stdout = buffer
-
-${code}
-
-sys.stdout = sys.__stdout__
-buffer.getvalue()
-`;
-
-let result = await pyodide.runPythonAsync(wrapped);
-
-output.innerText = result || "Code executed";
-
+if(result.trim()===""){
+result="Program executed successfully.";
 }
-catch(e){
-output.innerText = e;
+
+output.innerText = result;
+
+}catch(err){
+
+output.innerText = err;
+
 }
 
 }
