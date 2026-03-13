@@ -38,9 +38,10 @@ PROBLEM LIST
 const problems = [
 
 {
-title: "Hello World",
-desc: "Print Hello World",
-code: 'print("Hello World")'
+title:"Hello World",
+difficulty:"Easy",
+desc:"Print Hello World",
+code:'print("Hello World")'
 },
 
 {
@@ -75,8 +76,12 @@ const card = document.createElement("div");
 
 card.className = "card problem-card mb-2";
 
-card.innerHTML =
-`<div class="card-body"><b>${i+1}. ${p.title}</b></div>`;
+card.innerHTML = `
+<div class="card-body">
+<b>${i+1}. ${p.title}</b>
+<span class="badge bg-success ms-2">${p.difficulty}</span>
+</div>
+`;
 
 card.onclick = () => {
 
@@ -95,45 +100,49 @@ list.appendChild(card);
 /* -------------------------
 RUN PYTHON CODE
 ------------------------- */
-
 async function runCode(){
 
 const output = document.getElementById("output");
+const inputText = document.getElementById("userInput").value;
 
 if(!pyodide){
-
-output.innerText = "Python still loading...";
+output.innerText="Python loading...";
 return;
-
 }
 
 let code = editor.getValue();
 
 try{
 
-let wrappedCode = `
+let wrapped = `
 import sys
 from io import StringIO
+
+input_data = """${inputText}""".split("\\n")
+input_index = 0
+
+def input():
+    global input_index
+    value = input_data[input_index]
+    input_index += 1
+    return value
 
 buffer = StringIO()
 sys.stdout = buffer
 
 ${code}
 
-sys.stdout = sys.**stdout**
+sys.stdout = sys.__stdout__
 buffer.getvalue()
 `;
 
-let result = await pyodide.runPythonAsync(wrappedCode);
+let result = await pyodide.runPythonAsync(wrapped);
 
-output.innerText = result || "Code executed.";
+output.innerText = result || "Code executed";
 
 }
-
-catch(error){
-
-output.innerText = error;
-
+catch(e){
+output.innerText = e;
 }
 
 }
