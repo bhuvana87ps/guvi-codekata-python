@@ -1,27 +1,30 @@
 let editor = CodeMirror.fromTextArea(
 document.getElementById("editor"),
 {
-mode:"python",
-theme:"dracula",
-lineNumbers:true
+mode: "python",
+theme: "dracula",
+lineNumbers: true
 }
 );
 
-let pyodide;
-let pyodideReady=false;
+let pyodide = null;
+
+/* Load Python */
 
 async function loadPython(){
 
-document.getElementById("output").innerText="Loading Python...";
+document.getElementById("output").innerText = "Loading Python...";
 
-pyodide = await loadPyodide();
+pyodide = await loadPyodide({
+indexURL: "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/"
+});
 
-pyodideReady=true;
-
-document.getElementById("output").innerText="Python ready!";
+document.getElementById("output").innerText = "Python ready!";
 }
 
 loadPython();
+
+/* Problem List */
 
 const problems = [
 
@@ -45,31 +48,30 @@ code:'a,b=map(int,input().split())\nprint(a+b)'
 
 {
 title:"Reverse String",
-desc:"Input a string and reverse it",
+desc:"Input a string and print reverse",
 code:'s=input()\nprint(s[::-1])'
 }
 
 ];
 
-const list=document.getElementById("problemList");
+/* Sidebar */
+
+const list = document.getElementById("problemList");
 
 problems.forEach((p,i)=>{
 
-const card=document.createElement("div");
+const card = document.createElement("div");
 
-card.className="card problem-card mb-2";
+card.className = "card problem-card mb-2";
 
-card.innerHTML=`
-<div class="card-body">
-<b>${i+1}. ${p.title}</b>
-</div>
-`;
+card.innerHTML =
+`<div class="card-body"><b>${i+1}. ${p.title}</b></div>`;
 
-card.onclick=()=>{
+card.onclick = () => {
 
-document.getElementById("problemTitle").innerText=p.title;
+document.getElementById("problemTitle").innerText = p.title;
 
-document.getElementById("problemDesc").innerText=p.desc;
+document.getElementById("problemDesc").innerText = p.desc;
 
 editor.setValue(p.code);
 
@@ -79,28 +81,33 @@ list.appendChild(card);
 
 });
 
+/* Run Code */
+
 async function runCode(){
 
-if(!pyodideReady){
+if(!pyodide){
 
-document.getElementById("output").innerText="Python loading...";
+document.getElementById("output").innerText = "Python still loading...";
 return;
 
 }
 
-const code=editor.getValue();
+let code = editor.getValue();
 
 try{
 
-let result=await pyodide.runPythonAsync(code);
+let result = await pyodide.runPythonAsync(code);
 
-document.getElementById("output").innerText=result ?? "Code executed";
+if(result === undefined)
+result = "Code executed successfully";
+
+document.getElementById("output").innerText = result;
 
 }
 
 catch(error){
 
-document.getElementById("output").innerText=error;
+document.getElementById("output").innerText = error;
 
 }
 
