@@ -123,11 +123,11 @@ list.appendChild(card);
 RUN PYTHON CODE
 ------------------------- */
 
-async function runCode(){
+async function runCode() {
 
-if(!pyodide){
-document.getElementById("output").innerText="Python still loading...";
-return;
+if (!pyodide) {
+    document.getElementById("output").innerText = "Python still loading...";
+    return;
 }
 
 const code = editor.getValue();
@@ -135,27 +135,26 @@ const output = document.getElementById("output");
 
 output.innerText = "Running...";
 
-try{
+try {
 
-pyodide.runPython(`
+    // Reset stdout
+    pyodide.runPython(`
 import sys
 from io import StringIO
 sys.stdout = StringIO()
-`);
+    `);
 
-await pyodide.runPythonAsync(code);
+    // Execute code
+    await pyodide.runPythonAsync(code);
 
-let result = pyodide.runPython("sys.stdout.getvalue()");
+    // Capture printed output
+    const result = pyodide.runPython("sys.stdout.getvalue()");
 
-if(result.trim()===""){
-result="Program executed successfully.";
-}
+    output.innerText = result || "Program executed successfully.";
 
-output.innerText = result;
+} catch (err) {
 
-}catch(err){
-
-output.innerText = err;
+    output.innerText = err.toString();
 
 }
 
