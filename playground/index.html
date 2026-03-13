@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 
 <meta charset="UTF-8">
-<title>Python Playground</title>
+<title>Python Logic Playground</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
 
 <link rel="stylesheet" href="style.css">
 
@@ -19,9 +21,7 @@
 
 <nav class="navbar navbar-dark bg-dark">
 <div class="container-fluid">
-<span class="navbar-brand">
-Python Logic Playground
-</span>
+<span class="navbar-brand">Python Logic Playground</span>
 </div>
 </nav>
 
@@ -44,7 +44,7 @@ onkeyup="searchProblems()">
 
 </div>
 
-<!-- MAIN PANEL -->
+<!-- MAIN AREA -->
 <div class="col-md-9 p-4">
 
 <div class="card mb-3">
@@ -55,24 +55,34 @@ onkeyup="searchProblems()">
 </div>
 
 <textarea id="editor">
-
 print("Hello Python Playground")
-
 </textarea>
 
-<button class="btn btn-success mt-3" onclick="runCode()">
-Run Code
-</button>
-
 <div class="mt-3">
-<label class="form-label">Input</label>
+
+<button class="btn btn-success" onclick="runCode()">Run Code</button>
+
+<button class="btn btn-secondary ms-2" onclick="clearOutput()">Clear Output</button>
+
+</div>
+
+<!-- INPUT -->
+<div class="mt-4">
+
+<label class="form-label"><b>Input</b></label>
+
 <textarea
 id="userInput"
 class="form-control"
 rows="3"
-placeholder="Enter input values here"></textarea>
+placeholder="Example input:
+4
+5
+"></textarea>
+
 </div>
 
+<!-- OUTPUT -->
 <h5 class="mt-4">Output</h5>
 
 <div id="output"></div>
@@ -82,11 +92,13 @@ placeholder="Enter input values here"></textarea>
 </div>
 </div>
 
+
 <!-- LIBRARIES -->
 
 <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
 
 <script src="script.js"></script>
