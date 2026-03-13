@@ -86,20 +86,28 @@ list.appendChild(card);
 async function runCode(){
 
 if(!pyodide){
-
 document.getElementById("output").innerText = "Python still loading...";
 return;
-
 }
 
 let code = editor.getValue();
 
 try{
 
-let result = await pyodide.runPythonAsync(code);
+let wrappedCode = `
+import sys
+from io import StringIO
 
-if(result === undefined)
-result = "Code executed successfully";
+buffer = StringIO()
+sys.stdout = buffer
+
+${code}
+
+output = buffer.getvalue()
+output
+`;
+
+let result = await pyodide.runPythonAsync(wrappedCode);
 
 document.getElementById("output").innerText = result;
 
