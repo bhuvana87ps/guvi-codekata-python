@@ -23,8 +23,9 @@ box-shadow:0 6px 18px rgba(0,0,0,0.15);
 background:black;
 color:#00ff7f;
 padding:15px;
-min-height:100px;
+min-height:120px;
 font-family:monospace;
 border-radius:5px;
 margin-top:10px;
+white-space:pre-wrap;
 }
