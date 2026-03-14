@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 
 <meta charset="UTF-8">
@@ -31,20 +32,41 @@ href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.mi
 <!-- SIDEBAR -->
 <div class="col-md-3 sidebar p-3">
 
-<h5>Problems</h5>
+<h5>Progress</h5>
+
+<div class="progress mb-2">
+<div id="progressBar" class="progress-bar bg-success"></div>
+</div>
+
+<p id="progressText"></p>
+
+<h5 class="mt-3">Problems</h5>
 
 <input
 type="text"
 id="searchBox"
-class="form-control mb-3"
+class="form-control mb-2"
 placeholder="Search problems..."
 onkeyup="searchProblems()">
+
+<select id="difficultyFilter"
+class="form-select mb-3"
+onchange="filterProblems()">
+
+<option value="">All Difficulty</option>
+<option value="Easy">Easy</option>
+<option value="Medium">Medium</option>
+<option value="Hard">Hard</option>
+
+</select>
 
 <div id="problemList"></div>
 
 </div>
 
+
 <!-- MAIN AREA -->
+
 <div class="col-md-9 p-4">
 
 <div class="card mb-3">
@@ -66,7 +88,6 @@ print("Hello Python Playground")
 
 </div>
 
-<!-- INPUT -->
 <div class="mt-4">
 
 <label class="form-label"><b>Input</b></label>
@@ -75,14 +96,12 @@ print("Hello Python Playground")
 id="userInput"
 class="form-control"
 rows="3"
-placeholder="Example input:
+placeholder="Example:
 4
-5
-"></textarea>
+5"></textarea>
 
 </div>
 
-<!-- OUTPUT -->
 <h5 class="mt-4">Output</h5>
 
 <div id="output"></div>
@@ -92,8 +111,6 @@ placeholder="Example input:
 </div>
 </div>
 
-
-<!-- LIBRARIES -->
 
 <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
 

@@ -1,6 +1,8 @@
 let pyodide = null
 let editor = null
 
+let currentProblemId = null
+
 
 window.onload = async function(){
 
@@ -15,11 +17,10 @@ lineNumbers:true
 
 await loadPython()
 loadProblems()
+updateProgress()
 
 }
 
-
-/* LOAD PYTHON */
 
 async function loadPython(){
 
@@ -34,11 +35,10 @@ document.getElementById("output").innerText="Python Ready"
 }
 
 
-/* PROBLEMS */
-
 const problems = [
 
 {
+id:1,
 title:"Hello World",
 difficulty:"Easy",
 desc:"Print Hello World",
@@ -46,20 +46,23 @@ code:'print("Hello World")'
 },
 
 {
+id:2,
 title:"Square Number",
 difficulty:"Easy",
-desc:"Input a number and print its square",
+desc:"Input number and print square",
 code:'n=int(input())\nprint(n*n)'
 },
 
 {
+id:3,
 title:"Add Two Numbers",
 difficulty:"Easy",
-desc:"Input two numbers and print sum",
+desc:"Add two numbers",
 code:'a,b=map(int,input().split())\nprint(a+b)'
 },
 
 {
+id:4,
 title:"Reverse String",
 difficulty:"Easy",
 desc:"Reverse a string",
@@ -69,29 +72,32 @@ code:'s=input()\nprint(s[::-1])'
 ]
 
 
-/* LOAD SIDEBAR */
-
 function loadProblems(){
 
 const list=document.getElementById("problemList")
+list.innerHTML=""
 
-problems.forEach((p,i)=>{
+problems.forEach((p)=>{
 
 const card=document.createElement("div")
 
 card.className="card problem-card mb-2"
+card.dataset.difficulty=p.difficulty
 
 card.innerHTML=`
 <div class="card-body">
-<b>${i+1}. ${p.title}</b>
+<b>${p.id}. ${p.title}</b>
 <span class="badge bg-success ms-2">${p.difficulty}</span>
 </div>
 `
 
 card.onclick=()=>{
 
+currentProblemId=p.id
+
 document.getElementById("problemTitle").innerText=p.title
 document.getElementById("problemDesc").innerText=p.desc
+
 editor.setValue(p.code)
 
 }
@@ -103,7 +109,6 @@ list.appendChild(card)
 }
 
 
-/* SEARCH */
 
 function searchProblems(){
 
@@ -123,14 +128,30 @@ card.style.display="none"
 }
 
 
-/* CLEAR OUTPUT */
+function filterProblems(){
 
-function clearOutput(){
-document.getElementById("output").innerText=""
+const diff=document.getElementById("difficultyFilter").value
+
+const cards=document.querySelectorAll(".problem-card")
+
+cards.forEach(card=>{
+
+if(diff=="" || card.dataset.difficulty==diff)
+card.style.display="block"
+else
+card.style.display="none"
+
+})
+
 }
 
 
-/* RUN PYTHON */
+function clearOutput(){
+
+document.getElementById("output").innerText=""
+
+}
+
 
 async function runCode(){
 
@@ -153,11 +174,11 @@ pyodide.runPython(`
 import sys
 from io import StringIO
 
-data = """${input}""".splitlines()
-data_iter = iter(data)
+_input = """${input}""".split("\\n")
+_input_iter = iter(_input)
 
 def input():
-    return next(data_iter)
+    return next(_input_iter)
 
 sys.stdout = StringIO()
 `)
@@ -171,6 +192,8 @@ result="Program executed successfully"
 
 output.innerText=result
 
+markSolved(currentProblemId)
+
 }
 
 catch(err){
@@ -178,5 +201,42 @@ catch(err){
 output.innerText=err
 
 }
+
+}
+
+
+
+function markSolved(problemId){
+
+if(!problemId) return
+
+let solved = JSON.parse(localStorage.getItem("solved") || "[]")
+
+if(!solved.includes(problemId)){
+
+solved.push(problemId)
+
+localStorage.setItem("solved",JSON.stringify(solved))
+
+}
+
+updateProgress()
+
+}
+
+
+
+function updateProgress(){
+
+let solved = JSON.parse(localStorage.getItem("solved") || "[]")
+
+let total = problems.length
+
+let percent = (solved.length/total)*100
+
+document.getElementById("progressBar").style.width = percent+"%"
+
+document.getElementById("progressText").innerText =
+"Solved "+solved.length+" / "+total
 
 }
