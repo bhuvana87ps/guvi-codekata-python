@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://bhuvana87ps.github.io/guvi-codekata-python/sitemap.xml

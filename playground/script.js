@@ -2,6 +2,7 @@ let pyodide = null
 let editor = null
 
 let currentProblemId = null
+let problems = []   // problems will come from JSON
 
 
 window.onload = async function(){
@@ -16,11 +17,15 @@ lineNumbers:true
 )
 
 await loadPython()
-loadProblems()
+await loadProblems()
 updateProgress()
 
 }
 
+
+/* -------------------------
+LOAD PYTHON
+------------------------- */
 
 async function loadPython(){
 
@@ -35,44 +40,35 @@ document.getElementById("output").innerText="Python Ready"
 }
 
 
-const problems = [
+/* -------------------------
+LOAD PROBLEMS FROM JSON
+------------------------- */
 
-{
-id:1,
-title:"Hello World",
-difficulty:"Easy",
-desc:"Print Hello World",
-code:'print("Hello World")'
-},
+async function loadProblems(){
 
-{
-id:2,
-title:"Square Number",
-difficulty:"Easy",
-desc:"Input number and print square",
-code:'n=int(input())\nprint(n*n)'
-},
+try{
 
-{
-id:3,
-title:"Add Two Numbers",
-difficulty:"Easy",
-desc:"Add two numbers",
-code:'a,b=map(int,input().split())\nprint(a+b)'
-},
+const res = await fetch("../problems.json")
 
-{
-id:4,
-title:"Reverse String",
-difficulty:"Easy",
-desc:"Reverse a string",
-code:'s=input()\nprint(s[::-1])'
+problems = await res.json()
+
+renderProblems()
+
+}
+catch(err){
+
+console.error("Problem loading failed",err)
+
 }
 
-]
+}
 
 
-function loadProblems(){
+/* -------------------------
+RENDER SIDEBAR PROBLEMS
+------------------------- */
+
+function renderProblems(){
 
 const list=document.getElementById("problemList")
 list.innerHTML=""
@@ -109,6 +105,9 @@ list.appendChild(card)
 }
 
 
+/* -------------------------
+SEARCH
+------------------------- */
 
 function searchProblems(){
 
@@ -128,6 +127,10 @@ card.style.display="none"
 }
 
 
+/* -------------------------
+FILTER DIFFICULTY
+------------------------- */
+
 function filterProblems(){
 
 const diff=document.getElementById("difficultyFilter").value
@@ -146,12 +149,20 @@ card.style.display="none"
 }
 
 
+/* -------------------------
+CLEAR OUTPUT
+------------------------- */
+
 function clearOutput(){
 
 document.getElementById("output").innerText=""
 
 }
 
+
+/* -------------------------
+RUN PYTHON CODE
+------------------------- */
 
 async function runCode(){
 
@@ -205,6 +216,9 @@ output.innerText=err
 }
 
 
+/* -------------------------
+MARK SOLVED
+------------------------- */
 
 function markSolved(problemId){
 
@@ -225,12 +239,15 @@ updateProgress()
 }
 
 
+/* -------------------------
+UPDATE PROGRESS BAR
+------------------------- */
 
 function updateProgress(){
 
 let solved = JSON.parse(localStorage.getItem("solved") || "[]")
 
-let total = problems.length
+let total = problems.length || 1
 
 let percent = (solved.length/total)*100
 
@@ -238,5 +255,28 @@ document.getElementById("progressBar").style.width = percent+"%"
 
 document.getElementById("progressText").innerText =
 "Solved "+solved.length+" / "+total
+
+}
+
+
+/* -------------------------
+TEST CASE ENGINE
+------------------------- */
+
+async function runTestCases(code,tests){
+
+for(let t of tests){
+
+let input = t.input
+let expected = t.output
+
+let result = await executePython(code,input)
+
+if(result.trim() != expected.trim())
+return false
+
+}
+
+return true
 
 }

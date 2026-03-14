@@ -1,0 +1,30 @@
+[
+{
+"id":1,
+"title":"Hello World",
+"difficulty":"Easy",
+"desc":"Print Hello World",
+"code":"print('Hello World')"
+},
+{
+"id":2,
+"title":"Square Number",
+"difficulty":"Easy",
+"desc":"Input number and print square",
+"code":"n=int(input())\nprint(n*n)"
+},
+{
+"id":3,
+"title":"Add Two Numbers",
+"difficulty":"Easy",
+"desc":"Add two numbers",
+"code":"a,b=map(int,input().split())\nprint(a+b)"
+},
+{
+"id":4,
+"title":"Reverse String",
+"difficulty":"Easy",
+"desc":"Reverse string",
+"code":"s=input()\nprint(s[::-1])"
+}
+]

@@ -1,0 +1,16 @@
+<input id="username" placeholder="Enter username">
+
+<button onclick="login()">Login</button>
+
+<script>
+
+    function login(){
+
+let user = document.getElementById("username").value
+
+localStorage.setItem("user",user)
+
+alert("Welcome " + user)
+
+}
+</script>
